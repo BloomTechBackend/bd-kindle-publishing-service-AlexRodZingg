@@ -58,4 +58,23 @@ public class CatalogDao {
         }
         return results.get(0);
     }
+
+    /**
+     * Sets boolean inactive attribute of CatalogItemVersion to true, to soft-delete it.
+     * @param bookId the @DynamoDBHashKey of CatalogItemVersion
+     * @return CatalogItemVersion that is soft-deleted.
+     */
+    public CatalogItemVersion removeBookFromCatalog(String bookId) {
+
+        CatalogItemVersion book;
+        try {
+            book = getBookFromCatalog(bookId);
+        } catch (BookNotFoundException e) {
+            throw new BookNotFoundException(String.format("No book found for id: %s", bookId));
+        }
+
+        book.setInactive(true);
+        dynamoDbMapper.save(book);
+        return book;
+    }
 }

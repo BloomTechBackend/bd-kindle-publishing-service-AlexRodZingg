@@ -1,1 +1,86 @@
-PARTICIPANTS: use this file for creating the class diagram in mastery task 01
+@startuml
+class GetBookActivity {
+- rcs : RecommendationsServiceClient
+- cd : CatalogDao
+
++ execute(req: GetBookRequest) : GetBookResponse
+}
+
+class CatalogDao {
+- dynamoDBMapper : DynamoDBMapper
+
++ getBookFromCatalog(bookId : String) : CatalogItemVersion
++ getLatestVersionOfBook(bookId : String) : CatalogItemVersion
+}
+
+class RecommendationsServiceClient {
+- r : RecommendationsService
+
++ getBookRecommendations(g : BookGenre) : List<BookRecommendation>
+}
+
+class RecommendationsService {
+}
+
+GetBookActivity o-- CatalogDao
+GetBookActivity o-- RecommendationsServiceClient
+RecommendationsServiceClient *-- RecommendationsService
+
+class GetPublishingStatusActivity {
++ execute(pSR : GetPublishingStatusRequest) : GetPublishingStatusResponse
+}
+
+class RemoveBookFromCatalogActivity {
++ execute(rBFCR : RemoveBookFromCatalogRequest) : RemoveBookFromCatalogResponse
+}
+
+class SubmitBookForPublishingActivity {
+- pSD : PublishingStatusDao
+
++ execute(r : SubmitBookForPublishingRequest) : SubmitBookForPublishingResponse
+}
+
+class PublishingStatusDao {
+- dynamoDBMapper : DynamoDBMapper
++ setPublishingStatus(publishingRecordId : String, pRS : PublishingRecordStatus, bookId : String) : PublishingStatusItem
++ setPublishingStatus(publishingRecordId : String, p : PublishingRecordStatus, bookId : String, message : String) : PublishingStatusItem
+}
+
+SubmitBookForPublishingActivity o-- PublishingStatusDao
+
+class CatalogItemVersion {
+- @DynamoDBHashKey bookId : String
+- @DynamoDBRangeKey version : int
+- inactive : boolean
+- title : String
+- author : String
+- text : String
+- genre : BookGenre
+}
+
+CatalogItemVersion --> CatalogDao
+
+class PublishingStatusItem {
+- @DynamoDBHashKey publishingRecordId : String
+- @DynamoDBRangeKey status : PublishingRecordStatus
+- statusMessage : String
+- bookId : String
+}
+
+PublishingStatusItem --> PublishingStatusDao
+
+class RuntimeException {
+}
+
+class BookNotFoundException {
+}
+
+class PublishingStatusNotFoundException {
+}
+
+BookNotFoundException --|> RuntimeException
+PublishingStatusNotFoundException --|> RuntimeException
+
+CatalogDao --> BookNotFoundException
+
+@enduml
