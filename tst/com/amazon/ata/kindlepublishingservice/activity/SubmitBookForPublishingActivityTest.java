@@ -1,5 +1,6 @@
 package com.amazon.ata.kindlepublishingservice.activity;
 
+import com.amazon.ata.kindlepublishingservice.publishing.BookPublishRequestManager;
 import com.amazon.ata.recommendationsservice.types.BookGenre;
 import com.amazon.ata.kindlepublishingservice.models.requests.SubmitBookForPublishingRequest;
 import com.amazon.ata.kindlepublishingservice.models.response.SubmitBookForPublishingResponse;
@@ -15,22 +16,24 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class SubmitBookForPublishingActivityTest {
 
     @Mock
     private PublishingStatusDao publishingStatusDao;
+
+    @Mock
+    private CatalogDao catalogDao;
+
+    @Mock
+    private BookPublishRequestManager bookPublishRequestManager;
 
     @InjectMocks
     private SubmitBookForPublishingActivity activity;
@@ -57,12 +60,15 @@ public class SubmitBookForPublishingActivityTest {
                 eq(PublishingRecordStatus.QUEUED),
                 eq(request.getBookId()))).thenReturn(item);
 
+        doNothing().when(catalogDao).validateBookExists(anyString());
+
         // WHEN
         SubmitBookForPublishingResponse response = activity.execute(request);
 
         // THEN
         assertEquals("publishing.123", response.getPublishingRecordId(), "Expected response to return a publishing" +
                 "record id.");
+        verify(bookPublishRequestManager).addBookPublishRequest(any(BookPublishRequest.class));
     }
 
     @Test
@@ -80,11 +86,14 @@ public class SubmitBookForPublishingActivityTest {
                 eq(PublishingRecordStatus.QUEUED),
                 isNull())).thenReturn(item);
 
+        doNothing().when(catalogDao).validateBookExists(anyString());
+
         // WHEN
         SubmitBookForPublishingResponse response = activity.execute(request);
 
         // THEN
         assertEquals("publishing.123", response.getPublishingRecordId(), "Expected response to return a publishing" +
                 "record id.");
+        verify(bookPublishRequestManager).addBookPublishRequest(any(BookPublishRequest.class));
     }
 }
