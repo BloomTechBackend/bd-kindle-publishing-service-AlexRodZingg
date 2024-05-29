@@ -81,9 +81,10 @@ public class PublishingStatusDao {
     }
 
     /**
-     *
-     * @param publishStatusId
-     * @return
+     * Retrieve publishingStatusItems from PublishingStatus table in DynamoDB.
+     * Used by GetPublishingActivity.
+     * @param publishStatusId the Hash Key associated with item we are querying information for.
+     * @return list of publishing status details for the item of interest.
      */
     public List<PublishingStatusItem> getPublishingStatuses(String publishStatusId) {
         // item with desired HashKey for querying

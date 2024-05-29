@@ -21,9 +21,10 @@ public class GetPublishingStatusActivity {
     }
 
     /**
-     *
-     * @param publishingStatusRequest
-     * @return
+     * GetPublishingStatus API endpoint.
+     * Uses publishingRecordId to retrieve list of publishing status records for item.
+     * @param publishingStatusRequest contains the publishingRecordId.
+     * @return GetPublishingStatusResponse is a list of publishing status records.
      */
     public GetPublishingStatusResponse execute(GetPublishingStatusRequest publishingStatusRequest) {
 
