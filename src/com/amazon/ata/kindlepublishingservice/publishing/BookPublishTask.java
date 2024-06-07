@@ -2,6 +2,7 @@ package com.amazon.ata.kindlepublishingservice.publishing;
 
 import com.amazon.ata.kindlepublishingservice.dao.CatalogDao;
 import com.amazon.ata.kindlepublishingservice.dao.PublishingStatusDao;
+import com.amazon.ata.kindlepublishingservice.dynamodb.models.CatalogItemVersion;
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.PublishingStatusItem;
 import com.amazon.ata.kindlepublishingservice.enums.PublishingRecordStatus;
 import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
@@ -38,13 +39,17 @@ public class BookPublishTask implements Runnable {
 
             KindleFormattedBook book = KindleFormatConverter.format(request);
 
+            CatalogItemVersion newBookId;
             try {
-                catalogDao.createOrUpdateBook(book);
+                newBookId = catalogDao.createOrUpdateBook(book);
             } catch (BookNotFoundException e) {
                 publishingStatusDao.setPublishingStatus(request.getPublishingRecordId(), PublishingRecordStatus.FAILED, request.getBookId(),
                         e.getMessage());
 
+                continue;
             }
+
+            publishingStatusDao.setPublishingStatus(request.getPublishingRecordId(), PublishingRecordStatus.SUCCESSFUL, newBookId.getBookId());
         }
     }
 }
