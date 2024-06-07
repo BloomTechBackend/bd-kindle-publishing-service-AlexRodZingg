@@ -1,5 +1,8 @@
 package com.amazon.ata.kindlepublishingservice.dagger;
 
+import com.amazon.ata.kindlepublishingservice.dao.CatalogDao;
+import com.amazon.ata.kindlepublishingservice.dao.PublishingStatusDao;
+import com.amazon.ata.kindlepublishingservice.publishing.BookPublishRequestManager;
 import com.amazon.ata.kindlepublishingservice.publishing.BookPublishTask;
 import com.amazon.ata.kindlepublishingservice.publishing.BookPublisher;
 
@@ -16,8 +19,9 @@ public class PublishingModule {
 
     @Provides
     @Singleton
-    public BookPublisher provideBookPublisher(ScheduledExecutorService scheduledExecutorService) {
-        return new BookPublisher(scheduledExecutorService, new BookPublishTask());
+    public BookPublisher provideBookPublisher(ScheduledExecutorService scheduledExecutorService, CatalogDao catalogDao,
+                                              PublishingStatusDao publishingStatusDao, BookPublishRequestManager bookPublishRequestManager) {
+        return new BookPublisher(scheduledExecutorService, new BookPublishTask(bookPublishRequestManager, publishingStatusDao, catalogDao));
     }
 
     @Provides
