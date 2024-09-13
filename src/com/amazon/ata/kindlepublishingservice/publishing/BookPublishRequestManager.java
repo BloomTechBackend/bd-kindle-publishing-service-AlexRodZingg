@@ -16,15 +16,7 @@ public final class BookPublishRequestManager {
     }
 
     public void addBookPublishRequest(final BookPublishRequest request) {
-        BookPublishRequest newRequest = BookPublishRequest.builder()
-                                .withPublishingRecordId(request.getPublishingRecordId())
-                                .withBookId(request.getBookId())
-                                .withTitle(request.getTitle())
-                                .withAuthor(request.getAuthor())
-                                .withText(request.getText())
-                                .withGenre(request.getGenre())
-                                .build();
-        publishRequestQueue.offer(newRequest);
+        publishRequestQueue.offer(request);
     }
 
     public BookPublishRequest getBookPublishRequestToProcess() {
